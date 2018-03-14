@@ -1,0 +1,15 @@
+{
+  "name": "spotifysongadder",
+  "version": "0.1.0",
+  "description": "simple tray app to allow users to add songs to their spotify library with a global hotkey",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "test"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^1.8.3"
+  }
+}
