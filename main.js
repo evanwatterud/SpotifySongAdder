@@ -15,6 +15,11 @@ app.on('ready', () => {
   authorize()
 })
 
+// Prevent app from closing when all windows are closed
+app.on('window-all-closed', () => {
+  return false
+})
+
 createTray = () => {
   tray = new Tray(path.join(assetsDir, 'spotifyIcon.png')) // Icon made by Elegant Themes
 
@@ -38,8 +43,8 @@ addSong = () => {
 createWindow = () => {
   win = new BrowserWindow({width: 800, height: 600, center: true, minimizable: false, maximizable: false})
 
-  win.on('closed', () => {
-      win = null
+  win.on('closed', (event) => {
+    win = null
   })
 }
 
@@ -58,12 +63,16 @@ async function authorize() {
     'redirect_uri': 'http://127.0.0.1:5070/authorize_callback',
     'scope': 'user-library-modify user-read-currently-playing'
   }
-  
+
   win.loadURL(require('url').format(requestAuthUrl))
 }
 
 startServer = () => {
   app.server = createServer(app)
+}
+
+app.closeWindow = () => {
+  win.close()
 }
 
 app.on('will-quit', () => {
