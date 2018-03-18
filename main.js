@@ -2,6 +2,8 @@ const { app, Tray, globalShortcut, Menu, BrowserWindow } = require('electron')
 const path = require('path')
 const URL = require('url')
 const createServer = require('./server.js')
+var request = require('request')
+var keys = require('./keys')
 
 const assetsDir = path.join(__dirname, 'assets')
 let tray = null
@@ -36,8 +38,24 @@ registerHotkey = () => {
   })
 }
 
-addSong = () => {
+async function addSong() {
+  if (keys.access_token) {
+    await refreshAccessToken()
+  } else {
+    await refreshAccessToken()
+  }
 
+  await getCurrentSong()
+}
+
+getCurrentSong = () => {
+  request.get('https://api.spotify.com/v1/me/player/currently-playing', {
+    'auth': {
+      'bearer': keys.access_token
+    }
+  }, (err, res, body) => {
+    console.log(body);
+  })
 }
 
 createWindow = () => {
@@ -69,6 +87,39 @@ async function authorize() {
 
 startServer = () => {
   app.server = createServer(app)
+}
+
+refreshAccessToken = () => {
+  return request.post({
+    url: 'https://accounts.spotify.com/api/token',
+    form: {
+      grant_type: 'refresh_token',
+      refresh_token: keys.refresh_token,
+      client_id: keys.client_id,
+      client_secret: keys.client_secret
+    }
+  }, (err, res, body) => {
+    jsonBody = JSON.parse(body);
+    keys.access_token = jsonBody.access_token
+    return true
+  })
+}
+
+app.getAccessToken = (code) => {
+  request.post({
+    url: 'https://accounts.spotify.com/api/token',
+    form: {
+      grant_type: 'authorization_code',
+      code: code,
+      redirect_uri: 'http://127.0.0.1:5070/authorize_callback',
+      client_id: keys.client_id,
+      client_secret: keys.client_secret
+    }
+  }, (err, res, body) => {
+    jsonBody = JSON.parse(body);
+    keys.access_token = jsonBody.access_token
+    keys.refresh_token = jsonBody.refresh_token
+  })
 }
 
 app.closeWindow = () => {
