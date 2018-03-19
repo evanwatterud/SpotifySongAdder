@@ -18,8 +18,7 @@ function createServer(app) {
   })
 
   async function handleSuccess(code) {
-    keys.code = code
-    await app.getAccessToken(keys.code)
+    await app.getAccessToken(code)
     app.closeWindow()
     port.close()
   }

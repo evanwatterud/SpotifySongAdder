@@ -54,7 +54,24 @@ getCurrentSong = () => {
       'bearer': keys.access_token
     }
   }, (err, res, body) => {
-    console.log(body);
+    jsonBody = JSON.parse(body);
+    addCurrentSong(jsonBody.item.id)
+  })
+}
+
+addCurrentSong = (songId) => {
+  request.put('https://api.spotify.com/v1/me/tracks', {
+    'auth': {
+      'bearer': keys.access_token
+    },
+    json: true,
+    qs: {
+      ids: songId
+    }
+  }, (err, res, body) => {
+    if (err) {
+      console.log(err);
+    }
   })
 }
 
