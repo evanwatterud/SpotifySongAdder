@@ -39,11 +39,7 @@ registerHotkey = () => {
 }
 
 async function addSong() {
-  if (keys.access_token) {
-    await refreshAccessToken()
-  } else {
-    await refreshAccessToken()
-  }
+  await refreshAccessToken()
 
   await getCurrentSong()
 }
@@ -54,8 +50,11 @@ getCurrentSong = () => {
       'bearer': keys.access_token
     }
   }, (err, res, body) => {
-    jsonBody = JSON.parse(body);
-    addCurrentSong(jsonBody.item.id)
+    if (body) {
+      jsonBody = JSON.parse(body);
+      console.log(jsonBody);
+      addCurrentSong(jsonBody.item.id)
+    }
   })
 }
 
@@ -117,6 +116,7 @@ refreshAccessToken = () => {
     }
   }, (err, res, body) => {
     jsonBody = JSON.parse(body);
+    console.log(body);
     keys.access_token = jsonBody.access_token
     return true
   })
